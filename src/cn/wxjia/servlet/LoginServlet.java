@@ -8,10 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class VerifyCodeServlet extends HttpServlet {
-	private static final long serialVersionUID = 8993493049503406102L;
+public class LoginServlet extends HttpServlet {
 
-	public VerifyCodeServlet() {
+	private static final long serialVersionUID = -7140885796105726237L;
+
+	public LoginServlet() {
 		super();
 	}
 
@@ -21,20 +22,10 @@ public class VerifyCodeServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		response.setContentType("text/html;charset=utf-8");
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String inputVerifyCode = request.getParameter("verifyCode");
-		String createVerifyCode = (String) request.getSession().getAttribute(
-				"verifyCode");
-		// System.out.println("inputVerifyCode="+inputVerifyCode);
-		// System.out.println("createVerifyCode="+createVerifyCode);
-		if (inputVerifyCode.equalsIgnoreCase(createVerifyCode)) {
-			out.print("true");
-		} else {
-			out.print("false");
-		}
+		out.print("login success");
 		out.flush();
 		out.close();
 	}
@@ -45,5 +36,7 @@ public class VerifyCodeServlet extends HttpServlet {
 	}
 
 	public void init() throws ServletException {
+
 	}
+
 }

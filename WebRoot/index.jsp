@@ -1,4 +1,3 @@
-<%@page import="cn.wxjia.util.VerifyCode"%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 	String path = request.getContextPath();
@@ -21,13 +20,12 @@
 <script src="js/jquery-1.4.2.js"></script>
 </head>
 <body>
-
-	<form action="login">
+	<form action="LoginServlet" id="loginId">
 		用户名：<input type="text" name="username"><br> 验证码：<input
-			id="verify" type="text" name="verifyCode"> <img
-			id="verify_img" src="img/verifyCode.jpg" title="点击获取"
+			id="verifyCodeId" type="text" name="verifyCode"> <img
+			id="verify_img" src="DrawImageServlet" title="点击获取"
 			onclick="changeVerifyCode()" style="cursor:pointer;"> <br>
-		<input type="button" value="submit" onclick="test()"><br>
+		<input type="button" value="submit" onclick="testVerifyCode()"><br>
 	</form>
 	<script type="text/javascript">
 		var xmlHttpRequest;
@@ -55,60 +53,44 @@
 			}
 		}
 
-		function changeVerifyCode() {
-			var verify_img = document.getElementById("verify_img");
-			verify_img.setAttribute("onclick", "nullfunc()");
-
+		function testVerifyCode() {
 			createXmlHttpRequest();
 			if (xmlHttpRequest != null) {//确定XMLHttpRequest是否创建成功
 				var url = "VerifyCodeServlet";
-				xmlHttpRequest.open("POST", url, false);//是采用同步还是异步，true为异步
+				xmlHttpRequest.open("POST", url, true);//是采用同步还是异步，true为异步
 				//post请求要自己设置请求头  注意顺序
 				xmlHttpRequest.setRequestHeader("Content-Type",
 						"application/x-www-form-urlencoded;");
 
 				xmlHttpRequest.onreadystatechange = processRequest; //注册回调函数
 				//发送请求
-				xmlHttpRequest.send("a=a");
+				xmlHttpRequest.send("verifyCode=" + $("#verifyCodeId").val());
 			} else {
 				alert("不能创建XMLHttpRequest对象实例");
 			}
 		}
-
 		function processRequest() {
 			if (xmlHttpRequest.readyState == 4) {// 判断是否建立连接
 				if (xmlHttpRequest.status == 200) {
-					//responseText表示请求完成后，返回的字符串信息
-					var newSrc = "img/verifyCode.jpg?random=" + Math.random();
-					var verify_img = document.getElementById("verify_img");
-					verify_img.setAttribute("src", newSrc);
-					verify_img.setAttribute("onclick", "changeVerifyCode()");
-					randomCode = xmlHttpRequest.responseText;
+					var ret = xmlHttpRequest.responseText;
+					if (ret == "false") {
+						alert("验证码错误");
+						return;
+					} else if (ret == "true") {
+						$("#loginId").submit();
+					} else {
+						alert("servlet 进入失败");
+					}
 				} else {
 					alert("请求处理返回的数据有错误");
 				}
 			}
 		}
-
-		function test() {
-			var str = $.trim($('#verify').val());
-			alert("input:" + str);
-			alert("output:" + randomCode);
-			if (randomCode != str.toLowerCase()) {
-				alert("验证码不正确");
-				return false;
-			}
-			alert("登陆成功");
+		function changeVerifyCode() {
+			var newSrc = "DrawImageServlet?createTypeFlag=ch&random=" + Math.random();
+			var verify_img = document.getElementById("verify_img");
+			verify_img.setAttribute("src", newSrc);
 		}
-		function nullfunc() {
-
-		}
-
-		window.onload = function() {
-			alert("onload");
-			changeVerifyCode();
-		};
 	</script>
-
 </body>
 </html>
